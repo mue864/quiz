@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind utilities;
+@tailwind components;
+
+* {
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-family: 'OCR';
+    src: url('./assets/fonts/OCRAEXT.TTF');
+}
+
+.menu-btn {
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease-in;
+}
+
+.menu-btn:hover {
+    transform: scale(1.05);
+}
+
+.menu-btn:active {
+    transform: scale(0.9);
+}
+
+.brain {
+    transition: 300ms ease;
+}
+.brain:hover {
+    transform: scale(1.05);
+}
