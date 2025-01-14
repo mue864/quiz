@@ -1,11 +1,29 @@
 import brain from "../assets/img/brain.svg";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { DataContext } from "../app/DataProvider";
+import { useNavigate } from "react-router-dom";
+
 export const OnboardingPage = () => {
   const [selectedDifficulty, setSelectedDifficulty] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(new Set());
+  const [data, setData] = useState('');
 
+
+  const { addCategories, addDifficulty } = useContext(DataContext);
+  const navigate = useNavigate();
+
+  const handlePlayClick = () => {
+    try {
+      addCategories(data);
+      addDifficulty(selectedDifficulty);
+      navigate('/game');
+    } catch(error) {
+      console.error("Nav error: ", error);
+    }
+  }
 
   const difficultySelection = (difficulty) => {
+
     setSelectedDifficulty(difficulty);
   };
 
@@ -19,10 +37,13 @@ export const OnboardingPage = () => {
         newCatogory.add(category);
       }
 
-      console.log(newCatogory)
+      console.log(newCatogory);
+      const convertedString = Array.from(newCatogory).join(",");
+      setData(convertedString)
       return newCatogory;
     });
   };
+
 
   const addSelectedStyle = (difficulty) => {
     return selectedDifficulty === difficulty ? "bg-red-700" : "bg-gray-500";
@@ -51,23 +72,23 @@ export const OnboardingPage = () => {
             </div>
             <hr className="pb-5 mt-3 w-60" />
             <button
-              onClick={() => difficultySelection("Easy")}
+              onClick={() => difficultySelection("easy")}
               className={` w-[18rem] py-3 text-center text-white font-bold font-Outfit border border-white menu-btn rounded-2xl 
-              ${addSelectedStyle("Easy")}`}
+              ${addSelectedStyle("easy")}`}
             >
               Easy
             </button>
             <button
-              onClick={() => difficultySelection("Medium")}
+              onClick={() => difficultySelection("medium")}
               className={` mt-2 w-[18rem] py-3 text-center text-white font-bold font-Outfit border border-white menu-btn rounded-2xl
-                ${addSelectedStyle("Medium")}`}
+                ${addSelectedStyle("medium")}`}
             >
               Medium
             </button>
             <button
-              onClick={() => difficultySelection("Hard")}
+              onClick={() => difficultySelection("hard")}
               className={`bg-[#FA2D2D] mt-2 w-[18rem] py-3 text-center text-white font-bold font-Outfit border border-white menu-btn rounded-2xl 
-            ${addSelectedStyle("Hard")}`}
+            ${addSelectedStyle("hard")}`}
             >
               Hard
             </button>
@@ -87,7 +108,7 @@ export const OnboardingPage = () => {
               {/* first row */}
               {[
                 { name: "Music", color: "bg-[#F6A96F]" },
-                { name: "Film & TV", color: "bg-[#6F87F6]" },
+                { name: "Film", color: "bg-[#6F87F6]" },
                 { name: "Sport", color: "bg-[#BB1FEF]" },
               ].map((category) => (
                 <button
@@ -154,7 +175,10 @@ export const OnboardingPage = () => {
 
       <div className="flex justify-center items-center">
         <div className="flex justify-center items-center">
-          <button className="w-60 bg-[#6F87F6] py-3 rounded-full menu-btn text-white font-JoseFin text-xl">
+          <button
+            onClick={handlePlayClick}
+            className="w-60 bg-[#6F87F6] py-3 rounded-full menu-btn text-white font-JoseFin text-xl"
+          >
             Play
           </button>
         </div>

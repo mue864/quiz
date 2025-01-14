@@ -1,13 +1,7 @@
-import { createContext } from "react";
-
-export const CategoryContext = createContext();
-
-export const CategoryProvider = ({children}) => {
-
-
+export const CategoryProvider = () => {
     return (
-        <CategoryContext.Provider>
-            {children}
-        </CategoryContext.Provider>
+        <div>
+            
+        </div>
     )
 }
