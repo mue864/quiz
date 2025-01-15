@@ -44,6 +44,8 @@ export const Landing = () => {
             className="px-20 py-3 text-white font-bold bg-[#6AA558] border border-white rounded-2xl menu-btn">
               High Scores
             </button>
+
+            <p className="text-red-900 text-lg">* Please Note, this is still under maintanance and is not working properly</p>
           </div>
         </div>
       </>

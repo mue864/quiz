@@ -12,10 +12,15 @@ export const DataProvider = ({children}) => {
           .get(`https://the-trivia-api.com/v2/questions?categories=${category}`)
           .then((response) => {
             // filtering data based on selected difficulty
-            const filterData = response.data.filter(
-                (item) => item.difficulty === difficulty
-            )
-            setData(filterData)
+            if (difficulty !== null) {
+                const filterData = response.data.filter(
+                  (item) => item.difficulty === difficulty
+                );
+                setData(filterData);
+            } else {
+                setData(response.data)
+            }
+            
           })
           .catch((error) => console.log("there has been an error: ", error));
     }, [category, difficulty])
