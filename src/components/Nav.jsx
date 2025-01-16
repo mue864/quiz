@@ -1,10 +1,10 @@
 import bolt from "../assets/img/bolt.svg";
 export const Nav = ({ difficulty }) => {
   return (
-    <div className="flex justify-center items-center min-h-[10vh]">
+    <div className="flex justify-center items-center min-h-[10vh] nav">
       <div className="flex flex-row justify-center items-center space-x-96 text-xl">
         <div className="difficulty flex justify-center items-center">
-          <div className="loop flex items-center">
+          <div className="loop flex items-center nav">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -69,7 +69,7 @@ export const Nav = ({ difficulty }) => {
               />
             </svg>
           </div>
-          <div className="text font-Outfit">{difficulty}</div>
+          <div className="text font-Outfit nav">{difficulty}</div>
         </div>
         <div className="clock flex flex-row justify-center items-center">
           <div className="digital-clock flex justify-center items-center">
@@ -104,12 +104,12 @@ export const Nav = ({ difficulty }) => {
                 </rect>
               </svg>
             </div>
-            <div className="clock-text font-OCR">30</div>
+            <div className="clock-text font-OCR nav">30</div>
           </div>
         </div>
         <div className="streak flex flex-row justify-center items-center">
           <img src={bolt} alt="bolt" className="w-7" />
-          <div className="font-Outfit">4</div>
+          <div className="font-Outfit nav">4</div>
         </div>
       </div>
     </div>

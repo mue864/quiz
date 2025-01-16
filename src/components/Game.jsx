@@ -3,7 +3,8 @@ import { DataContext } from "../app/DataProvider";
 import { useContext, useEffect, useState } from "react";
 export const Game = () => {
   const [questions, setQuestions] = useState([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answerCorrect, setAnswerCorrect] = useState(false);
   const { data } = useContext(DataContext);
   const colors = [
     "bg-[#6AA558]", // green
@@ -23,6 +24,10 @@ export const Game = () => {
   const getRandomColor = () => {
     return colors[Math.floor(Math.random() * colors.length)];
   };
+
+  const checkResult = (result) => {
+    setAnswerCorrect(result);
+  }
 
 useEffect(() => {
   if (data) {
@@ -63,14 +68,18 @@ useEffect(() => {
               {questions[currentQuestionIndex].question}
             </p>
 
-            {questions[currentQuestionIndex]?.answers.map((item, i) => (
-              <button
-                key={i}
-                className={`${item.color} w-72 mb-3 py-2 font-Outfit text-white text-center border border-white rounded-2xl`}
-              >
-                {item.text}
-              </button>
-            ))}
+            <div className="mt-8 flex flex-col">
+              {questions[currentQuestionIndex]?.answers.map((item, i) => (
+                <button
+                  key={i}
+                  className={`${item.color} w-72  mb-3 py-3 font-Outfit text-white text-center border border-white rounded-2xl menu-btn`}
+                  onClick={() => checkResult(item.isCorrect)}
+                >
+                  {answerCorrect ? "true" : "false"}
+                  {item.text}
+                </button>
+              ))}
+            </div>
 
             <button
               onClick={handleNextQuestion}
