@@ -4,8 +4,13 @@ import { useContext, useEffect, useState } from "react";
 export const Game = () => {
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answerCorrect, setAnswerCorrect] = useState(false);
+  const [answeredQuestions, setAnsweredQuestions] = useState({});
+  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [score, setScore] = useState(0);
+  const [answerCorrect, setAnswerCorrect] = useState("");
   const { data } = useContext(DataContext);
+
   const colors = [
     "bg-[#6AA558]", // green
     "bg-[#FA2D2D]", // red
@@ -27,32 +32,58 @@ export const Game = () => {
 
   const checkResult = (result) => {
     setAnswerCorrect(result);
-  }
+  };
 
-useEffect(() => {
-  if (data) {
-    const transformData = data.map((item) => ({
-      difficulty: item.difficulty,
-      question: item.question.text,
-      answers: [
-        { text: item.correctAnswer, color: getRandomColor(), isCorrect: true },
-        ...item.incorrectAnswers.map((answer) => ({
-          text: answer,
-          color: getRandomColor(),
-          isCorrect: false,
-        })),
-      ].sort(() => Math.random() - 0.5),
-    }));
-    setQuestions(transformData);
-  }
-}, [data]);
+  useEffect(() => {
+    if (data) {
+      const transformData = data.map((item) => ({
+        difficulty: item.difficulty,
+        question: item.question.text,
+        answers: [
+          {
+            text: item.correctAnswer,
+            color: getRandomColor(),
+            isCorrect: true,
+          },
+          ...item.incorrectAnswers.map((answer) => ({
+            text: answer,
+            color: getRandomColor(),
+            isCorrect: false,
+          })),
+        ].sort(() => Math.random() - 0.5),
+      }));
+      setQuestions(transformData);
+    }
+  }, [data]);
 
+  const handleAnswerClick = (isCorrect, questionIndex, answerIndex) => {
+    if (!answeredQuestions[questionIndex]) {
+      setSelectedIndex(answerIndex);
+
+      setAnsweredQuestions((prev) => ({
+        ...prev,
+        [questionIndex]: isCorrect,
+      }));
+
+      setSelectedAnswers((prev) => ({
+        ...prev,
+        [questionIndex]: answerIndex,
+      }));
+
+      if (isCorrect) {
+        setScore((prev) => prev + 5);
+      } else {
+        setScore((prev) => prev - 2);
+      }
+    }
+  };
 
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
+      setSelectedIndex(null);
+      setCurrentQuestionIndex((prev) => prev + 1);
     }
-  }
+  };
 
   return (
     <div>
@@ -60,9 +91,10 @@ useEffect(() => {
         <div>
           <div className="nav">
             {questions[currentQuestionIndex] && (
-              <Nav difficulty={questions[currentQuestionIndex].difficulty} />
+              <Nav difficulty={questions[currentQuestionIndex].difficulty} score={score} />
             )}
           </div>
+
           <div className="body flex flex-col justify-center items-center min-h-[90vh]">
             <p className="font-Outfit text-3xl font-semibold max-w-3xl text-center">
               {questions[currentQuestionIndex].question}
@@ -72,10 +104,23 @@ useEffect(() => {
               {questions[currentQuestionIndex]?.answers.map((item, i) => (
                 <button
                   key={i}
-                  className={`${item.color} w-72  mb-3 py-3 font-Outfit text-white text-center border border-white rounded-2xl menu-btn`}
-                  onClick={() => checkResult(item.isCorrect)}
+                  disabled={answeredQuestions[currentQuestionIndex]}
+                  className={`${
+                    item.color
+                  } w-72 mb-3 py-3 font-Outfit text-white text-center border border-white rounded-2xl menu-btn
+                    ${
+                      answeredQuestions[currentQuestionIndex]
+                        ? item.isCorrect
+                          ? "bg-green-500"
+                          : selectedIndex === i
+                          ? "bg-red-500"
+                          : ""
+                        : ""
+                    }`}
+                  onClick={() =>
+                    handleAnswerClick(item.isCorrect, currentQuestionIndex, i)
+                  }
                 >
-                  {answerCorrect ? "true" : "false"}
                   {item.text}
                 </button>
               ))}
@@ -87,6 +132,8 @@ useEffect(() => {
             >
               Next Question
             </button>
+
+            {answerCorrect ? "correct" : "incorrect"}
           </div>
         </div>
       ) : (
