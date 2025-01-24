@@ -1,6 +1,6 @@
 import bolt from "../assets/img/bolt.svg";
 import { Timer } from "../components/Timer";
-export const Nav = ({ difficulty, score }) => {
+export const Nav = ({ difficulty, score, onEndSession }) => {
   return (
     <div className="flex justify-center items-center min-h-[10vh] nav">
       <div className="flex flex-row justify-center items-center space-x-96 text-xl">
@@ -105,7 +105,7 @@ export const Nav = ({ difficulty, score }) => {
                 </rect>
               </svg>
             </div>
-            <div className={`clock-text font-OCR nav `}>{<Timer />}</div>
+            <div className={`clock-text font-OCR nav `}>{<Timer onEndSession={onEndSession} />}</div>
           </div>
         </div>
         <div className="streak flex flex-row justify-center items-center">

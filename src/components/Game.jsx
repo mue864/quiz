@@ -1,6 +1,8 @@
 import { Nav } from "./Nav";
 import { DataContext } from "../app/DataProvider";
 import { useContext, useEffect, useState } from "react";
+import { Timer } from "./Timer";
+
 export const Game = () => {
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -9,6 +11,7 @@ export const Game = () => {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [score, setScore] = useState(0);
   const [answerCorrect, setAnswerCorrect] = useState("");
+  const [endSession, setEndSession] = useState(false);
   const { data } = useContext(DataContext);
 
   const colors = [
@@ -28,10 +31,6 @@ export const Game = () => {
 
   const getRandomColor = () => {
     return colors[Math.floor(Math.random() * colors.length)];
-  };
-
-  const checkResult = (result) => {
-    setAnswerCorrect(result);
   };
 
   useEffect(() => {
@@ -85,22 +84,34 @@ export const Game = () => {
     }
   };
 
+  const onEndSession = (endSession) => {
+    setEndSession(endSession);
+  };
+
   return (
     <div>
       {Array.isArray(questions) && questions.length > 0 ? (
         <div>
           <div className="nav">
             {questions[currentQuestionIndex] && (
-              <Nav difficulty={questions[currentQuestionIndex].difficulty} score={score} />
+              <Nav
+                difficulty={questions[currentQuestionIndex].difficulty}
+                score={score}
+                onEndSession={onEndSession}
+              />
             )}
           </div>
 
+
           <div className="body flex flex-col justify-center items-center min-h-[90vh]">
-            <p className="font-Outfit text-3xl font-semibold max-w-3xl text-center">
+
+            {!endSession ? (
+              <div>
+                <p className="font-Outfit text-3xl font-semibold max-w-3xl text-center">
               {questions[currentQuestionIndex].question}
             </p>
 
-            <div className="mt-8 flex flex-col">
+            <div className="mt-8 flex flex-col justify-centere items-center">
               {questions[currentQuestionIndex]?.answers.map((item, i) => (
                 <button
                   key={i}
@@ -134,6 +145,13 @@ export const Game = () => {
             </button>
 
             {answerCorrect ? "correct" : "incorrect"}
+              </div>
+            ) : (
+              <div>
+                <p>times up</p>
+              </div>
+            ) }
+            
           </div>
         </div>
       ) : (
