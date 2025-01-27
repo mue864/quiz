@@ -1,7 +1,6 @@
 import { Nav } from "./Nav";
 import { DataContext } from "../app/DataProvider";
 import { useContext, useEffect, useState } from "react";
-import { Timer } from "./Timer";
 
 export const Game = () => {
   const [questions, setQuestions] = useState([]);
@@ -10,8 +9,8 @@ export const Game = () => {
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [score, setScore] = useState(0);
-  const [answerCorrect, setAnswerCorrect] = useState("");
   const [endSession, setEndSession] = useState(false);
+  const [reset, setReset] = useState(false);
   const { data } = useContext(DataContext);
 
   const colors = [
@@ -79,8 +78,10 @@ export const Game = () => {
 
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
+      setEndSession(false);
       setSelectedIndex(null);
       setCurrentQuestionIndex((prev) => prev + 1);
+      setReset(true);
     }
   };
 
@@ -88,6 +89,9 @@ export const Game = () => {
     setEndSession(endSession);
   };
 
+  const onReset = (toggleReset) => {
+    setReset(toggleReset);
+  }
   return (
     <div>
       {Array.isArray(questions) && questions.length > 0 ? (
@@ -98,27 +102,27 @@ export const Game = () => {
                 difficulty={questions[currentQuestionIndex].difficulty}
                 score={score}
                 onEndSession={onEndSession}
+                reset={reset}
+                onReset={onReset}
               />
             )}
           </div>
 
-
           <div className="body flex flex-col justify-center items-center min-h-[90vh]">
-
             {!endSession ? (
               <div>
                 <p className="font-Outfit text-3xl font-semibold max-w-3xl text-center">
-              {questions[currentQuestionIndex].question}
-            </p>
+                  {questions[currentQuestionIndex].question}
+                </p>
 
-            <div className="mt-8 flex flex-col justify-centere items-center">
-              {questions[currentQuestionIndex]?.answers.map((item, i) => (
-                <button
-                  key={i}
-                  disabled={answeredQuestions[currentQuestionIndex]}
-                  className={`${
-                    item.color
-                  } w-72 mb-3 py-3 font-Outfit text-white text-center border border-white rounded-2xl menu-btn
+                <div className="mt-8 flex flex-col justify-centere items-center">
+                  {questions[currentQuestionIndex]?.answers.map((item, i) => (
+                    <button
+                      key={i}
+                      disabled={answeredQuestions[currentQuestionIndex]}
+                      className={`${
+                        item.color
+                      } w-72 mb-3 py-3 font-Outfit text-white text-center border border-white rounded-2xl menu-btn
                     ${
                       answeredQuestions[currentQuestionIndex]
                         ? item.isCorrect
@@ -128,30 +132,31 @@ export const Game = () => {
                           : ""
                         : ""
                     }`}
-                  onClick={() =>
-                    handleAnswerClick(item.isCorrect, currentQuestionIndex, i)
-                  }
-                >
-                  {item.text}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={handleNextQuestion}
-              className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
-            >
-              Next Question
-            </button>
-
-            {answerCorrect ? "correct" : "incorrect"}
+                      onClick={() =>
+                        handleAnswerClick(
+                          item.isCorrect,
+                          currentQuestionIndex,
+                          i
+                        )
+                      }
+                    >
+                      {item.text}
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : (
               <div>
-                <p>times up</p>
+                <p>Times up</p>
+
+                <button
+                onClick={handleNextQuestion}
+                  className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+                >
+                  Next Question
+                </button>
               </div>
-            ) }
-            
+            )}
           </div>
         </div>
       ) : (
