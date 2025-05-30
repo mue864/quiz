@@ -1,40 +1,115 @@
 @tailwind base;
-@tailwind utilities;
 @tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary: #4f46e5;
+  --primary-light: #818cf8;
+  --secondary: #10b981;
+  --danger: #ef4444;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --dark: #1f2937;
+  --light: #f9fafb;
+  --gray: #6b7280;
+  --gray-light: #e5e7eb;
+}
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-    transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  @apply bg-gradient-to-br from-indigo-50 to-blue-50 min-h-screen text-gray-800;
+  transition: all 0.3s ease;
 }
 
-@font-face {
-    font-family: 'OCR';
-    src: url('./assets/fonts/OCRAEXT.TTF');
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.menu-btn {
-    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.4);
-    transition: all 0.3s ease-in;
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
-.menu-btn:hover {
-    transform: scale(1.05);
+/* Components */
+.btn {
+  @apply px-6 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-.menu-btn:active {
-    transform: scale(0.9);
+.btn-primary {
+  @apply bg-indigo-600 text-white hover:bg-indigo-700;
 }
 
-.brain {
-    transition: 300ms ease;
-}
-.brain:hover {
-    transform: scale(1.05);
+.btn-secondary {
+  @apply bg-emerald-600 text-white hover:bg-emerald-700;
 }
 
-.nav {
-    transition: all 0.3s ease-in-out;
+.btn-outline {
+  @apply bg-white border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50;
+}
+
+.card {
+  @apply bg-white rounded-2xl p-8 shadow-lg;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.answer-option {
+  @apply p-4 rounded-xl border-2 border-gray-200 transition-all duration-300 cursor-pointer hover:border-indigo-400 hover:bg-indigo-50;
+}
+
+.answer-option.correct {
+  @apply border-green-500 bg-green-50 text-green-700;
+}
+
+.answer-option.incorrect {
+  @apply border-red-500 bg-red-50 text-red-700;
+}
+
+.answer-option.selected {
+  @apply border-indigo-600 bg-indigo-100;
+}
+
+/* Progress Bar */
+.progress-container {
+  @apply w-full bg-gray-200 rounded-full h-2.5 mt-4;
+}
+
+.progress-bar {
+  @apply bg-indigo-600 h-2.5 rounded-full transition-all duration-500 ease-out;
+}
+
+/* Loading Animation */
+.loading-spinner {
+  @apply w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .card {
+    @apply p-4;
+  }
+  
+  .btn {
+    @apply px-4 py-2 text-sm;
+  }
+}
+
+/* Custom Animations */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
