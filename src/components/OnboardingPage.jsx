@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useContext, useState } from 'react';
 import { DataContext } from '../app/DataProvider';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowRight, FaBrain, FaCheck, FaChevronRight } from 'react-icons/fa';
+import { FaArrowRight, FaCheck, FaChevronRight } from 'react-icons/fa';
 
 const difficulties = [
   {
@@ -44,14 +44,16 @@ export const OnboardingPage = () => {
   const [selectedDifficulty, setSelectedDifficulty] = useState(null);
   const [selectedCategories, setSelectedCategories] = useState(new Set());
   const [data, setData] = useState('');
+  const [questionAmount, setQuestionAmountLocal] = useState(10);
 
-  const { addCategories, addDifficulty } = useContext(DataContext);
+  const { addCategories, addDifficulty, setQuestionAmount } = useContext(DataContext);
   const navigate = useNavigate();
 
   const handlePlayClick = () => {
     try {
       addCategories(data);
       addDifficulty(selectedDifficulty);
+      setQuestionAmount(questionAmount);
       navigate('/game');
     } catch (error) {
       console.error('Navigation error:', error);
@@ -61,6 +63,10 @@ export const OnboardingPage = () => {
   const handleNextStep = () => {
     if (step === 1 && !selectedDifficulty) return;
     if (step === 2 && selectedCategories.size === 0) return;
+    if (step === 3) {
+      handlePlayClick();
+      return;
+    }
     setStep(step + 1);
   };
 
@@ -89,42 +95,42 @@ export const OnboardingPage = () => {
   const isCategorySelected = (category) => selectedCategories.has(category);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-800 text-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Progress Steps */}
         <div className="mb-12">
           <div className="flex items-center justify-between relative">
             {/* Line */}
-            <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -z-10">
+            <div className="absolute top-1/2 left-0 right-0 h-1 bg-white/20 -z-10">
               <motion.div
-                className="h-full bg-indigo-600 rounded-full"
+                className="h-full bg-indigo-500 rounded-full"
                 initial={{ width: '0%' }}
-                animate={{ width: `${(step / 2) * 100}%` }}
+                animate={{ width: `${(step / 3) * 100}%` }}
                 transition={{ duration: 0.5 }}
               />
             </div>
             
             {/* Steps */}
-            {[1, 2].map((stepNum) => (
+            {[1, 2, 3].map((stepNum) => (
               <div key={stepNum} className="flex flex-col items-center">
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-medium ${
                     step >= stepNum
-                      ? 'bg-indigo-600'
-                      : 'bg-gray-300'
+                      ? 'bg-indigo-500'
+                      : 'bg-white/20'
                   }`}
                 >
                   {step > stepNum ? <FaCheck /> : stepNum}
                 </div>
-                <span className="mt-2 text-sm font-medium text-gray-600">
-                  {stepNum === 1 ? 'Difficulty' : 'Categories'}
+                <span className="mt-2 text-sm font-medium text-indigo-200">
+                  {stepNum === 1 ? 'Difficulty' : stepNum === 2 ? 'Categories' : 'Options'}
                 </span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden border border-white/20">
           <div className="p-8">
             <AnimatePresence mode="wait">
               {step === 1 && (
@@ -137,49 +143,38 @@ export const OnboardingPage = () => {
                   className="space-y-8"
                 >
                   <div className="text-center">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                    <h2 className="text-3xl font-bold text-white mb-2">
                       Select Difficulty
                     </h2>
-                    <p className="text-gray-600">
+                    <p className="text-indigo-200">
                       Choose how challenging you want the questions to be
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {difficulties.map((difficulty) => (
                       <motion.div
                         key={difficulty.id}
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`relative p-6 rounded-xl cursor-pointer transition-all ${
-                          selectedDifficulty === difficulty.id
-                            ? 'ring-2 ring-offset-2 ring-indigo-500 bg-gradient-to-br from-indigo-50 to-blue-50'
-                            : 'bg-white border-2 border-gray-200 hover:border-indigo-300'
-                        }`}
                         onClick={() => handleDifficultySelect(difficulty.id)}
+                        className={`cursor-pointer rounded-xl overflow-hidden transition-all duration-300 relative ${selectedDifficulty === difficulty.id ? 'ring-2 ring-indigo-400 transform scale-105' : 'hover:shadow-lg'}`}
+                        whileHover={{ y: -4 }}
+                        whileTap={{ y: 0 }}
                       >
-                        <div
-                          className={`w-12 h-12 rounded-lg mb-4 flex items-center justify-center text-white text-xl ${
-                            selectedDifficulty === difficulty.id
-                              ? difficulty.selectedColor
-                              : `bg-gradient-to-r ${difficulty.color}`
-                          }`}
-                        >
-                          {difficulty.id === 'easy' && '😊'}
-                          {difficulty.id === 'medium' && '🤔'}
-                          {difficulty.id === 'hard' && '🧠'}
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {difficulty.name}
-                        </h3>
-                        <p className="mt-1 text-sm text-gray-500">
-                          {difficulty.description}
-                        </p>
-                        {selectedDifficulty === difficulty.id && (
-                          <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center">
-                            <FaCheck className="text-indigo-600 text-xs" />
+                        <div className={`bg-gradient-to-br ${difficulty.color} p-6 text-white backdrop-blur-md bg-opacity-20 border border-white/10`}>
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-xl font-bold mb-1">{difficulty.name}</h3>
+                            {difficulty.id === 'easy' && <span className="text-2xl">😊</span>}
+                            {difficulty.id === 'medium' && <span className="text-2xl">🤔</span>}
+                            {difficulty.id === 'hard' && <span className="text-2xl">🧠</span>}
                           </div>
-                        )}
+                          <p className="text-white/80 text-sm">{difficulty.description}</p>
+                          
+                          {selectedDifficulty === difficulty.id && (
+                            <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-indigo-500/30 flex items-center justify-center">
+                              <FaCheck className="text-white text-xs" />
+                            </div>
+                          )}
+                        </div>
                       </motion.div>
                     ))}
                   </div>
@@ -196,11 +191,11 @@ export const OnboardingPage = () => {
                   className="space-y-8"
                 >
                   <div className="text-center">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                    <h2 className="text-3xl font-bold text-white mb-2">
                       Select Categories
                     </h2>
-                    <p className="text-gray-600">
-                      Choose one or more categories you're interested in
+                    <p className="text-indigo-200">
+                      Choose one or more categories you&apos;re interested in
                     </p>
                   </div>
 
@@ -210,25 +205,85 @@ export const OnboardingPage = () => {
                         key={category.id}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                        className={`p-4 rounded-xl border cursor-pointer transition-all ${
                           isCategorySelected(category.id)
-                            ? 'border-indigo-500 bg-indigo-50'
-                            : 'border-gray-200 hover:border-indigo-300'
+                            ? 'border-indigo-400 bg-indigo-500/20 backdrop-blur-md'
+                            : 'border-white/10 hover:border-indigo-400/50 bg-white/5 backdrop-blur-md'
                         }`}
                         onClick={() => toggleCategory(category.id)}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-medium text-gray-900">
+                          <span className="font-medium text-white">
                             {category.name}
                           </span>
                           {isCategorySelected(category.id) && (
-                            <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center">
-                              <FaCheck className="text-indigo-600 text-xs" />
+                            <div className="w-5 h-5 rounded-full bg-indigo-500/30 flex items-center justify-center">
+                              <FaCheck className="text-white text-xs" />
                             </div>
                           )}
                         </div>
                       </motion.div>
                     ))}
+                  </div>
+                </motion.div>
+              )}
+              {step === 3 && (
+                <motion.div
+                  key="step3"
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -50 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-8"
+                >
+                  <div className="text-center">
+                    <h2 className="text-3xl font-bold text-white mb-2">
+                      Quiz Options
+                    </h2>
+                    <p className="text-indigo-200">
+                      Customize your quiz experience
+                    </p>
+                  </div>
+
+                  <div className="max-w-md mx-auto">
+                    <div className="mb-8">
+                      <label className="block text-sm font-medium text-white mb-2">Number of Questions</label>
+                      <div className="flex items-center">
+                        <input
+                          type="range"
+                          min="5"
+                          max="50"
+                          step="5"
+                          value={questionAmount}
+                          onChange={(e) => setQuestionAmountLocal(parseInt(e.target.value))}
+                          className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <span className="ml-4 bg-indigo-500/30 text-white font-medium px-3 py-1 rounded-lg min-w-[3rem] text-center">
+                          {questionAmount}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm text-indigo-200">
+                        {questionAmount < 10 ? 'Quick quiz' : questionAmount > 30 ? 'Long quiz session' : 'Standard quiz length'}
+                      </p>
+                    </div>
+
+                    <div className="bg-indigo-500/20 backdrop-blur-md rounded-xl p-4 border border-indigo-400/30">
+                      <h3 className="font-medium text-white mb-2">Quiz Summary</h3>
+                      <ul className="space-y-2 text-sm">
+                        <li className="flex justify-between">
+                          <span className="text-indigo-200">Difficulty:</span>
+                          <span className="font-medium text-white capitalize">{selectedDifficulty}</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span className="text-indigo-200">Categories:</span>
+                          <span className="font-medium text-white">{selectedCategories.size} selected</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span className="text-indigo-200">Questions:</span>
+                          <span className="font-medium text-white">{questionAmount}</span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -239,7 +294,7 @@ export const OnboardingPage = () => {
                 <motion.button
                   onClick={handlePrevStep}
                   whileHover={{ x: -4 }}
-                  className="flex items-center text-gray-600 hover:text-gray-900 font-medium"
+                  className="flex items-center text-indigo-200 hover:text-white font-medium"
                 >
                   <FaChevronRight className="transform rotate-180 mr-2" />
                   Back
@@ -261,17 +316,27 @@ export const OnboardingPage = () => {
                   Next
                   <FaChevronRight className="ml-2" />
                 </motion.button>
-              ) : (
+              ) : step < 3 ? (
                 <motion.button
-                  onClick={handlePlayClick}
+                  onClick={handleNextStep}
                   disabled={selectedCategories.size === 0}
                   className={`ml-auto flex items-center px-6 py-3 rounded-xl font-medium text-white ${
                     selectedCategories.size > 0
-                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700'
+                      ? 'bg-indigo-600 hover:bg-indigo-700'
                       : 'bg-gray-300 cursor-not-allowed'
                   }`}
                   whileHover={selectedCategories.size > 0 ? { scale: 1.03 } : {}}
                   whileTap={selectedCategories.size > 0 ? { scale: 0.98 } : {}}
+                >
+                  Next
+                  <FaChevronRight className="ml-2" />
+                </motion.button>
+              ) : (
+                <motion.button
+                  onClick={handlePlayClick}
+                  className="ml-auto flex items-center px-6 py-3 rounded-xl font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   Start Game
                   <FaArrowRight className="ml-2" />

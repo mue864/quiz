@@ -1,116 +1,220 @@
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaTrophy, FaHome, FaRedo } from 'react-icons/fa';
+import { FaTrophy, FaHome, FaRedo, FaFilter, FaSearch, FaTrash } from 'react-icons/fa';
+import { DataContext } from '../app/DataProvider';
 
 export const Highscores = () => {
     const [scores, setScores] = useState([]);
+    const [filteredScores, setFilteredScores] = useState([]);
+    const [filterCategory, setFilterCategory] = useState('');
+    const [filterDifficulty, setFilterDifficulty] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showFilters, setShowFilters] = useState(false);
+    const { userScores, clearScores } = useContext(DataContext);
     const navigate = useNavigate();
 
+    // Get unique categories and difficulties for filters
+    const categories = [...new Set(scores.map(score => score.category || '').filter(Boolean))];
+    const difficulties = [...new Set(scores.map(score => score.difficulty || '').filter(Boolean))];
+    
+    // Load scores from local storage
     useEffect(() => {
-        // In a real app, you would fetch scores from your backend
-        const mockScores = [
-            { id: 1, name: 'Quiz Master', score: 950, date: '2023-04-15' },
-            { id: 2, name: 'Trivia King', score: 890, date: '2023-04-14' },
-            { id: 3, name: 'Brainiac', score: 850, date: '2023-04-13' },
-            { id: 4, name: 'Whiz Kid', score: 800, date: '2023-04-12' },
-            { id: 5, name: 'Quizzer', score: 750, date: '2023-04-11' },
-        ];
-        setScores(mockScores);
-    }, []);
-
-    const container = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1
-            }
+        setScores(userScores);
+        setFilteredScores(userScores);
+    }, [userScores]);
+    
+    // Apply filters and search
+    useEffect(() => {
+        let result = [...scores];
+        
+        // Apply category filter
+        if (filterCategory) {
+            result = result.filter(score => score.category === filterCategory);
+        }
+        
+        // Apply difficulty filter
+        if (filterDifficulty) {
+            result = result.filter(score => score.difficulty === filterDifficulty);
+        }
+        
+        // Apply search
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            result = result.filter(score => 
+                score.name.toLowerCase().includes(term)
+            );
+        }
+        
+        // Sort by score (highest first)
+        result.sort((a, b) => b.score - a.score);
+        
+        setFilteredScores(result);
+    }, [scores, filterCategory, filterDifficulty, searchTerm]);
+    
+    // Handle clearing scores
+    const handleClearScores = () => {
+        if (window.confirm('Are you sure you want to clear all scores? This cannot be undone.')) {
+            clearScores();
         }
     };
 
-    const item = {
-        hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0 }
-    };
-
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-900 to-purple-900 text-white p-6">
+        <motion.div 
+            className="min-h-screen bg-gradient-to-br from-indigo-900 to-purple-900 text-white p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+        >
             <div className="max-w-4xl mx-auto">
-                <motion.div 
-                    initial={{ y: -50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className="text-center mb-12"
-                >
-                    <h1 className="text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-yellow-500">
-                        Leaderboard
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                    <h1 className="text-3xl font-bold flex items-center">
+                        <FaTrophy className="text-yellow-400 mr-3" /> 
+                        High Scores
                     </h1>
-                    <p className="text-xl text-gray-300">Top performers of all time</p>
-                </motion.div>
-
-                <motion.div 
-                    variants={container}
-                    initial="hidden"
-                    animate="show"
-                    className="space-y-4 mb-8"
-                >
-                    {scores.map((score, index) => (
-                        <motion.div
-                            key={score.id}
-                            variants={item}
-                            whileHover={{ scale: 1.02 }}
-                            className="bg-white/10 backdrop-blur-md rounded-xl p-6 flex items-center justify-between shadow-lg"
+                    <div className="flex space-x-2">
+                        <button 
+                            onClick={() => navigate('/')}
+                            className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors"
+                            aria-label="Home"
                         >
-                            <div className="flex items-center space-x-4">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold ${
-                                    index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900' :
-                                    index === 1 ? 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-700' :
-                                    index === 2 ? 'bg-gradient-to-r from-amber-600 to-amber-800 text-amber-100' :
-                                    'bg-indigo-600 text-white'
-                                }`}>
-                                    {index + 1}
+                            <FaHome />
+                        </button>
+                        <button 
+                            onClick={() => navigate('/onboard')}
+                            className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors"
+                            aria-label="Play Again"
+                        >
+                            <FaRedo />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Search and filter */}
+                <div className="mb-8">
+                    <div className="flex flex-wrap gap-4 mb-4">
+                        <div className="flex-1 min-w-[200px]">
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Search by player name..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full bg-white/10 border border-white/20 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                />
+                                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
+                                className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition-colors"
+                            >
+                                <FaFilter />
+                                <span>{showFilters ? 'Hide Filters' : 'Show Filters'}</span>
+                            </button>
+                            
+                            {scores.length > 0 && (
+                                <button 
+                                    onClick={handleClearScores}
+                                    className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 transition-colors"
+                                    title="Clear all local scores"
+                                >
+                                    <FaTrash />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    
+                    {showFilters && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="bg-white/5 backdrop-blur-md rounded-xl p-6 mb-6"
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Category</label>
+                                    <select
+                                        value={filterCategory}
+                                        onChange={(e) => setFilterCategory(e.target.value)}
+                                        className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    >
+                                        <option value="">All Categories</option>
+                                        {categories.map(category => (
+                                            <option key={category} value={category}>{category}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-semibold">{score.name}</h3>
-                                    <p className="text-gray-400 text-sm">{new Date(score.date).toLocaleDateString()}</p>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Difficulty</label>
+                                    <select
+                                        value={filterDifficulty}
+                                        onChange={(e) => setFilterDifficulty(e.target.value)}
+                                        className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    >
+                                        <option value="">All Difficulties</option>
+                                        {difficulties.map(difficulty => (
+                                            <option key={difficulty} value={difficulty}>{difficulty}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
-                            <div className="flex items-center space-x-2">
-                                <FaTrophy className={`text-xl ${
-                                    index === 0 ? 'text-yellow-400' : 
-                                    index === 1 ? 'text-gray-300' : 
-                                    index === 2 ? 'text-amber-600' : 'text-indigo-400'
-                                }`} />
-                                <span className="text-2xl font-bold">{score.score}</span>
-                                <span className="text-gray-400">pts</span>
-                            </div>
                         </motion.div>
-                    ))}
-                </motion.div>
+                    )}
+                </div>
+                
+                {/* Scores table */}
+                <div className="bg-white/10 backdrop-blur-md rounded-xl overflow-hidden overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="border-b border-white/20">
+                                <th className="p-4 text-left">Rank</th>
+                                <th className="p-4 text-left">Player</th>
+                                <th className="p-4 text-left">Score</th>
+                                <th className="p-4 text-left">Category</th>
+                                <th className="p-4 text-left">Difficulty</th>
+                                <th className="p-4 text-left">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredScores.length > 0 ? (
+                                filteredScores.map((score, index) => (
+                                    <tr 
+                                        key={index} 
+                                        className="border-b border-white/10 hover:bg-white/5 transition-colors"
+                                    >
+                                        <td className="p-4">
+                                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10">
+                                                {index + 1}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 font-medium">{score.name}</td>
+                                        <td className="p-4 font-bold text-yellow-400">{score.score}</td>
+                                        <td className="p-4">{score.category || 'General'}</td>
+                                        <td className="p-4 capitalize">{score.difficulty || 'medium'}</td>
+                                        <td className="p-4 text-sm text-gray-300">
+                                            {score.date ? new Date(score.date).toLocaleDateString() : 'N/A'}
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={6} className="p-8 text-center text-gray-400">
+                                        No scores found. Play a game to set a high score!
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
 
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="flex justify-center space-x-4 mt-8"
-                >
-                    <button
-                        onClick={() => navigate('/')}
-                        className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full font-medium transition-all duration-300 transform hover:scale-105"
-                    >
-                        <FaHome />
-                        <span>Home</span>
-                    </button>
-                    <button
-                        onClick={() => navigate('/onboard')}
-                        className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-6 py-3 rounded-full font-medium transition-all duration-300 transform hover:scale-105"
-                    >
-                        <FaRedo />
-                        <span>Play Again</span>
-                    </button>
-                </motion.div>
+                <div className="text-center mt-8 text-gray-400 text-sm">
+                    <p>Play more games to improve your ranking!</p>
+                </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
