@@ -249,7 +249,7 @@ export const Game = () => {
           </div>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
             <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-              <div className="bg-white/10 backdrop-blur-md rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center">
+              <div className="bg-white/10 backdrop-blur-md rounded-full w-12 h-12 sm:w-12 sm:h-12 flex items-center justify-center">
                 <span className="text-lg sm:text-xl font-bold">{currentQuestionIndex + 1}/{questions.length}</span>
               </div>
               <div className="bg-white/10 backdrop-blur-md px-3 py-1 sm:px-4 sm:py-2 rounded-full">
@@ -276,7 +276,7 @@ export const Game = () => {
               transition={{ duration: 0.3 }}
               className="max-w-3xl mx-auto"
             >
-              {!timeUp ? (
+              {!gameCompleted && !timeUp ? (
                 <>
                   <motion.h2 
                     className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-6 sm:mb-8 md:mb-12 leading-tight px-2"
