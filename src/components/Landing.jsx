@@ -35,7 +35,7 @@ export const Landing = () => {
               <FaBrain className="text-indigo-300 text-4xl" />
             </div>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent">
-              Trivia Challenge
+              Brain Trivia
             </h1>
           </motion.div>
           <motion.div 
@@ -45,7 +45,7 @@ export const Landing = () => {
             className="mt-6 max-w-2xl mx-auto"
           >
             <p className="text-xl text-indigo-200">
-              Test your knowledge with our enhanced quiz experience!
+              Test your knowledge!
             </p>
           </motion.div>
         </header>
@@ -83,7 +83,7 @@ export const Landing = () => {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold mb-2 text-white">Timed Challenges</h3>
-                  <p className="text-indigo-200">Race against the clock to earn bonus points. Faster answers mean higher scores in this exciting time-based quiz format.</p>
+                  <p className="text-indigo-200">Race against the clock to earn bonus points. Faster answers mean higher scores.</p>
                 </div>
               </div>
             </motion.div>
@@ -138,7 +138,7 @@ export const Landing = () => {
                         <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center mr-3">
                           <FaLightbulb className="text-indigo-300" />
                         </div>
-                        <span>Hint system for difficult questions</span>
+                        <span>Hints if you ever get stuck</span>
                       </li>
                       <li className="flex items-center text-white">
                         <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center mr-3">
@@ -218,7 +218,7 @@ export const Landing = () => {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold mb-2 text-white">Knowledge Expansion</h3>
-                  <p className="text-indigo-200">Learn interesting facts while having fun. Our diverse question bank helps expand your knowledge across multiple domains.</p>
+                  <p className="text-indigo-200">Learn interesting facts while having fun. There are diverse questions that can help expand your knowledge.</p>
                 </div>
               </div>
             </motion.div>
@@ -227,7 +227,7 @@ export const Landing = () => {
 
         {/* Footer */}
         <footer className="text-center text-indigo-300/60 text-sm">
-          <p>© 2025 Trivia Challenge | Test your knowledge and have fun!</p>
+          <p>© 2025 Brain Trivia | Test your knowledge and have fun!</p>
         </footer>
       </div>
     </div>
